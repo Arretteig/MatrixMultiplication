@@ -1,0 +1,60 @@
+
+public class c {
+
+		static int matrixChainOrder(int [] p) {
+			int n = p.length -1;
+			int [][] m = new int[n][n];
+			int [][] s = new int[n][n];
+			for (int i = 0; i < n; i++) {
+				m[i][i] = 0;
+			}
+			for (int row = 1; row < n; row++) {
+				for (int i = 0; i < n - row; i++) {
+					int j = i + row;
+					m[i][j] = Integer.MAX_VALUE;
+					for (int k = i; k <j; k++) {
+						int q = m[i][k] + m[k+1][j] + p[i]*p[k+1]*p[j+1];
+						if (k == i) {
+							m[i][j] = q;
+							s[i][j] = k;
+						}
+							else if (k==i +1) {
+								if (m[i][j] > q) {
+									m[i][j] = q;
+									s[i][j] = k;
+								}
+							} else {
+								if (q < m[i][j]) {
+									m[i][j] = q;
+									s[i][j] = k;
+								}
+							}
+						}
+
+						if (row == p.length -2) {
+							return m[i][j];
+						}
+					}
+				}
+				return -1;
+			}
+
+	static void printOptimalParens (int[][] s, int i, int j) {
+		if (i == j) {
+			System.out.println((i+1));
+		} 
+		else {
+			System.out.println("(");
+			printOptimalParens(s, i, s[i][j]);
+			printOptimalParens(s, s[i][j]+1, j);
+			System.out.println(")");
+		}
+	}
+
+	static int matrixChainMultiply (int[] A, int s, int i, int j) {
+		if (i == j) {
+			return A[i];			
+		}
+		else 
+	}
+}
