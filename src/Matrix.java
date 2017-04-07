@@ -1,12 +1,13 @@
 
 public class Matrix {
 
+	// A 2x3 Matrix has 2 rows and 3 columns. WHY IS IT SO CONFUSING?!
 	private int rows;
 	private int columns;
 	
 	private int[][] matrix;
 	
-	public Matrix(int c, int r){
+	public Matrix(int r, int c){
 		this.rows = r;
 		this.columns = c;
 	}

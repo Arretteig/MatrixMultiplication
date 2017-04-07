@@ -1,122 +1,113 @@
+import java.util.Arrays;
+
 public class MatrixChainMultiplication {
 
+	private static int[] p = { 30, 35, 15, 5, 10, 20, 25 };
 	private static int[][] m;
 	private static int[][] s;
+	private static Matrix c;
 
-	public void matrixChainOrder(int[] p){
+	public static void matrixChainOrder() {
 		int n = p.length - 1;
-		m = new int[n][n];
-		s = new int[n-1][n]; // s? [n-1]["2 to n"]
-		for (int i = 0; i < n; i++) {
+		m = new int[n + 1][n + 1];
+		s = new int[n + 1][n + 1];
+		for (int i = 1; i <= n; i++)
 			m[i][i] = 0;
-		}
-		for (int l = 1; l < n; l++) {
-			for (int i = 0; i < n - l + 1; i++) { // int i = 1 they say
-				int j = i + l; // i + l - 1 they say
-				m[i][j] = Integer.MAX_VALUE;
-				for(int k = i; i < j; k++){
-					int q = m[i][k] + m[k+1][j] + p[i-1]*p[k]*p[j]; //index off by 1?
-					if(q < m[i][j]){
-						m[i][j] = q;
-						s[i][j] = k;
-					}
-				}
-			}
-		}
-		// pseudo code says to return m and s
-	}
-
-	static int matrixChainOrder2(int[] p) {
-
-		int n = p.length - 1;
-		int[][] m = new int[n][n];
-		int[][] s = new int[n][n];
-		for (int i = 0; i < n; i++) {
-			m[i][i] = 0;
-		}
-		for (int row = 1; row < n; row++) {
-			for (int i = 0; i < n - row; i++) {
-				int j = i + row;
+		for (int l = 2; l <= n; l++) {
+			for (int i = 1; i <= n - l + 1; i++) {
+				int j = i + l - 1;
 				m[i][j] = Integer.MAX_VALUE;
 				for (int k = i; k < j; k++) {
-					int q = m[i][k] + m[k + 1][j] + p[i] * p[k+1] * p[j+1];
-					if (k == i) {
+					int q = m[i][k] + m[k + 1][j] + p[i - 1] * p[k] * p[j];
+					if (q < m[i][j]) {
 						m[i][j] = q;
 						s[i][j] = k;
 					}
-					else if (k == i + 1) {
-						if (m[i][j] > q) {
-							m[i][j] = q;
-							s[i][j] = k;
-						}
-					} else {
-						if (q < m[i][j]) {
-							m[i][j] = q;
-							s[i][j] = k;
-						}
-					}
-				}
-				if (row == p.length - 2) {
-					return m[i][j];
 				}
 			}
 		}
-		return -1;
 	}
 
-	public static void printOptimalParens(int[][] s, int i, int j) {
-		if (i == j) {
-			System.out.println("A" + (i));
-		}
-		else {
-			System.out.println("(");
-			printOptimalParens(s, i, s[i][j]);
-			printOptimalParens(s, s[i][j] + 1, j);
-			System.out.println(")");
-		}
+	private static String printOptimalParens(int i, int j) {
+		if (i == j)
+			return "A[" + i + "]";
+		else
+			return "(" + printOptimalParens(i, s[i][j]) + printOptimalParens(s[i][j] + 1, j) + ")";
 	}
 
-	public static Matrix matrixChainMultiply (Matrix[] A, int t, int i, int j) {
+	public static void printOptimal() {
+		System.out.println(printOptimalParens(1, p.length - 1));
+	}
+
+	public static Matrix matrixChainMultiply(Matrix[] A, int t, int i, int j) {
 		if (i == j) {
 			return A[i];
-		}
-		else{
+		} else {
 			Matrix leftChain = matrixChainMultiply(A, t, i, s[i][j]);
-			Matrix rightChain = matrixChainMultiply(A, t, s[i][j]+1, j);
-			Matrix result = matrixMultiply(leftChain, rightChain);
-			return result;
+			Matrix rightChain = matrixChainMultiply(A, t, s[i][j] + 1, j);
+			matrixMultiply(leftChain, rightChain);
+			return c;
 		}
 	}
 
-	private static Matrix matrixMultiply(Matrix A, Matrix B) {
-		Matrix C = new Matrix(A.getRows(), B.getColumns());
-		if(A.getColumns() != B.getColumns()){
+	private static void matrixMultiply(Matrix A, Matrix B) {
+		if (A.getColumns() != B.getColumns()) {
 			System.out.println("CAN NOT MULTIPLY");
-			System.exit(0);
-		}
-		else{
-			for(int i = 0; i < A.getRows(); i++){
-				for(int j = 0; j < B.getColumns(); j++){
-					C.setValue(i, j, 0);
-					for(int k = 0; k < A.getColumns(); k++){
-						C.setValue(i, j, (C.getValue(i, j) + A.getValue(i, k) * B.getValue(k, j)));
+		} else {
+			c = new Matrix(A.getRows(), B.getColumns());
+			for (int i = 0; i < A.getRows(); i++) {
+				for (int j = 0; j < B.getColumns(); j++) {
+					c.setValue(i, j, 0);
+					for (int k = 0; k < A.getColumns(); k++) {
+						c.setValue(i, j, (c.getValue(i, j) + A.getValue(i, k) * B.getValue(k, j)));
 					}
 				}
 			}
 		}
-		return C;
 	}
-	
+
 	public void recursiveChainMultiply() {
-		
+
 	}
-	
-	public void memoizedMatrixChain() {
-		
+
+	public static void memoizedMatrixChain() {
+		int n = p.length - 1;
+		m = new int[n + 1][n + 1];
+		s = new int[n + 1][n + 1];
+		for (int i = 1; i <= n; i++) {
+			for (int j = i; j <= n; j++) {
+				m[i][j] = Integer.MAX_VALUE;
+			}
+		}
+		int x = lookupChain(1, n);
 	}
-	
-	public void lookupChain() {
-		
+
+	public static int lookupChain(int i, int j) {
+		if (m[i][j] < Integer.MAX_VALUE) {
+			return m[i][j];
+		}
+		if (i == j) {
+			m[i][j] = 0;
+		} else {
+			for (int k = i; k <= j - 1; k++) {
+				int q = lookupChain(i, k) + lookupChain(k + 1, j) + p[i - 1] * p[k] * p[j];
+				if (q < m[i][j]) {
+					m[i][j] = q;
+					s[i][j] = k;
+				}
+			}
+		}
+		return m[i][j];
+	}
+
+	public static void main(String[] args) {
+		matrixChainOrder();
+		System.out.print("Matrix Chain Order: \n");
+		printOptimal();
+		System.out.println();
+
+		memoizedMatrixChain();
+		System.out.print("Memoized Matrix Chain: \n");
+		printOptimal();
 	}
 }
-	
