@@ -1,4 +1,6 @@
-import java.util.Arrays;
+
+import java.io.IOException;
+import java.util.Scanner;
 
 public class MatrixChainMultiplication {
 
@@ -79,7 +81,7 @@ public class MatrixChainMultiplication {
 				m[i][j] = Integer.MAX_VALUE;
 			}
 		}
-		int x = lookupChain(1, n);
+		lookupChain(1, n);
 	}
 
 	public static int lookupChain(int i, int j) {
@@ -100,14 +102,74 @@ public class MatrixChainMultiplication {
 		return m[i][j];
 	}
 
-	public static void main(String[] args) {
-		matrixChainOrder();
-		System.out.print("Matrix Chain Order: \n");
-		printOptimal();
-		System.out.println();
+	public static void menu(Scanner input){
+		try {
+			start(input);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
 
-		memoizedMatrixChain();
-		System.out.print("Memoized Matrix Chain: \n");
+
+	private static void start(Scanner input) throws IOException {
+		System.out.println("Options 'default' or an integer. ");	
+		System.out.print("How many Matrices?: ");
+		
+		try{
+			getDimensions(input);
+		}
+		catch(NumberFormatException e){
+			System.out.println("\nINVALID INPUT");
+			start(input);
+			System.exit(0);
+		}finally{
+			input.close();
+			System.out.println();
+		}
+		
+		createMatrices();
+		
+		long timeMCO = System.nanoTime();
+		matrixChainOrder();
+		timeMCO = System.nanoTime() - timeMCO;
 		printOptimal();
+		System.out.println("Matrix chain order runtime took " + timeMCO + " nanoseconds.");
+		
+		timeMCO = System.nanoTime();
+		memoizedMatrixChain();
+		timeMCO = System.nanoTime() - timeMCO;
+		System.out.println("Memoized matrix chain runtime took " + timeMCO + " nanoseconds.");
+
+	}
+
+
+	private static void getDimensions(Scanner input) throws IOException {
+		String in = input.next();
+		if(in.contains("default")){
+			System.out.println("[30x35, 35x15, 15x5, 5x10, 10x20, 20x25]");
+		}else{
+			int n = Integer.valueOf(in) + 1;
+			p = new int[n];
+			System.out.print("Enter the first dimension of Matrix A(1): " );
+			int dimension = input.nextInt();
+			p[0] = dimension;
+			for(int i = 1; i < n; i++){
+				System.out.print("Enter the second dimension of Matrix A(" + i + "): ");
+				dimension = input.nextInt();
+				p[i] = dimension;
+			}
+			System.out.println();
+		}
+	}
+	
+
+	private static void createMatrices() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public static void main(String[] args) {
+		Scanner input = new Scanner(System.in);
+		menu(input);
 	}
 }
