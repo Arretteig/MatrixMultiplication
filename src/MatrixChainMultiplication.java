@@ -178,12 +178,6 @@ public class MatrixChainMultiplication {
 	private static void createMatrices() {
 		int n = p.length-1;
 		array = new Matrix[n];
-//		array[0] = new Matrix(p[0], p[1]);
-//		for(int row1 = 0; row1 < p[0]; row1++){
-//			for(int col1 = 0; col1 < p[1]; col1++){
-//				int value = (int) (Math.random() * 5) + 1;
-//				array[0].setValue(row1, col1, value);
-//			}
 		for(int i = 0; i < n; i++){
 			array[i] = new Matrix(p[i], p[i+1]);
 			for(int row = 0; row < p[i]; row++){
@@ -192,7 +186,7 @@ public class MatrixChainMultiplication {
 					array[i].setValue(row, col, value);
 				}
 			}
-		}//				private static int[] p = { 30, 35, 15, 5, 10, 20, 25 }; // Array of dimensions
+		}
 	}
 
     public static String printMatrix(Matrix in){
