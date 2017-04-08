@@ -4,10 +4,11 @@ import java.util.Scanner;
 
 public class MatrixChainMultiplication {
 
-	private static int[] p = { 30, 35, 15, 5, 10, 20, 25 };
-	private static int[][] m;
-	private static int[][] s;
-	private static Matrix c;
+	private static int[] p = { 30, 35, 15, 5, 10, 20, 25 }; // Array of dimensions
+	private static int[][] m; // Tracks lowest scalar multiplications.
+	private static int[][] s; // Tracks correct path.
+	private static Matrix c; // Matrix used to multiply matrices.
+	private static Matrix[] array;
 
 	public static void matrixChainOrder() {
 		int n = p.length - 1;
@@ -32,7 +33,7 @@ public class MatrixChainMultiplication {
 
 	private static String printOptimalParens(int i, int j) {
 		if (i == j)
-			return "A[" + i + "]";
+			return " A" + i + " ";
 		else
 			return "(" + printOptimalParens(i, s[i][j]) + printOptimalParens(s[i][j] + 1, j) + ")";
 	}
@@ -41,19 +42,19 @@ public class MatrixChainMultiplication {
 		System.out.println(printOptimalParens(1, p.length - 1));
 	}
 
-	public static Matrix matrixChainMultiply(Matrix[] A, int t, int i, int j) {
+	public static Matrix recursiveChainMultiply(Matrix[] A, int t, int i, int j) {
 		if (i == j) {
 			return A[i];
 		} else {
-			Matrix leftChain = matrixChainMultiply(A, t, i, s[i][j]);
-			Matrix rightChain = matrixChainMultiply(A, t, s[i][j] + 1, j);
+			Matrix leftChain = recursiveChainMultiply(A, t, i, s[i][j]);
+			Matrix rightChain = recursiveChainMultiply(A, t, s[i][j] + 1, j);
 			matrixMultiply(leftChain, rightChain);
 			return c;
 		}
 	}
 
 	private static void matrixMultiply(Matrix A, Matrix B) {
-		if (A.getColumns() != B.getColumns()) {
+		if (A.getColumns() != B.getRows()) {
 			System.out.println("CAN NOT MULTIPLY");
 		} else {
 			c = new Matrix(A.getRows(), B.getColumns());
@@ -68,10 +69,7 @@ public class MatrixChainMultiplication {
 		}
 	}
 
-	public void recursiveChainMultiply() {
-
-	}
-
+	
 	public static void memoizedMatrixChain() {
 		int n = p.length - 1;
 		m = new int[n + 1][n + 1];
@@ -119,27 +117,40 @@ public class MatrixChainMultiplication {
 			getDimensions(input);
 		}
 		catch(NumberFormatException e){
-			System.out.println("\nINVALID INPUT");
+			System.out.println("\nINVALID INPUT\n");
 			start(input);
 			System.exit(0);
-		}finally{
+		}
+		finally{
 			input.close();
 			System.out.println();
 		}
 		
-		createMatrices();
+//		Matrix[] matrices = new Matrix[p.length-1];
+//		createMatrices();
+		
+		long timeLTR = System.nanoTime();
+//		matrixChainMultiply(matrices, 0, 0, 0);		
+		timeLTR = System.nanoTime() - timeLTR;
 		
 		long timeMCO = System.nanoTime();
 		matrixChainOrder();
 		timeMCO = System.nanoTime() - timeMCO;
+
+		long timeMMO = System.nanoTime();
+		memoizedMatrixChain();
+		timeMMO = System.nanoTime() - timeMMO;
+		
+		long timeOpt = System.nanoTime();
+//		matrixChainMultiply(matrices, 0, 0, 0);		
+		timeOpt = System.nanoTime() - timeOpt;
+		
 		printOptimal();
 		System.out.println("Matrix chain order runtime took " + timeMCO + " nanoseconds.");
-		
-		timeMCO = System.nanoTime();
-		memoizedMatrixChain();
-		timeMCO = System.nanoTime() - timeMCO;
-		System.out.println("Memoized matrix chain runtime took " + timeMCO + " nanoseconds.");
-
+		System.out.println("Memoized matrix chain runtime took " + timeMMO + " nanoseconds.");
+		System.out.println("Multiplying in order of left to right took " + timeLTR + " nanoseconds.");
+		System.out.println("Multiplying in optimal order took " + timeOpt + " nanoseconds.");
+		System.out.println("Memoized matrix and multiplying total: [" + (timeMMO + timeOpt) + "] nanoseconds.");
 	}
 
 
@@ -158,18 +169,56 @@ public class MatrixChainMultiplication {
 				dimension = input.nextInt();
 				p[i] = dimension;
 			}
-			System.out.println();
 		}
+		System.out.println("Computing... ");
 	}
 	
 
+	@SuppressWarnings("unused")
 	private static void createMatrices() {
-		// TODO Auto-generated method stub
-		
+		int n = p.length-1;
+		array = new Matrix[n];
+//		array[0] = new Matrix(p[0], p[1]);
+//		for(int row1 = 0; row1 < p[0]; row1++){
+//			for(int col1 = 0; col1 < p[1]; col1++){
+//				int value = (int) (Math.random() * 5) + 1;
+//				array[0].setValue(row1, col1, value);
+//			}
+		for(int i = 0; i < n; i++){
+			array[i] = new Matrix(p[i], p[i+1]);
+			for(int row = 0; row < p[i]; row++){
+				for(int col = 0; col < p[i+1]; col++){
+					int value = (int) (Math.random() * 5) + 1;
+					array[i].setValue(row, col, value);
+				}
+			}
+		}//				private static int[] p = { 30, 35, 15, 5, 10, 20, 25 }; // Array of dimensions
 	}
 
+    public static String printMatrix(Matrix in){
+        String s = new String();
+        s = in.getRows() + " x " + in.getColumns() + "\n" + "\n";
+
+        for(int i=0;i<in.getRows();i++)
+        {
+            s = s+" ";
+            for(int j = 0; j<in.getColumns();j++)
+            {
+                s = s+in.getValue(i, j)+" ";
+            }
+            s = s+"\n";
+        }
+        return s;
+    }
+	
 	public static void main(String[] args) {
-		Scanner input = new Scanner(System.in);
-		menu(input);
+		createMatrices();
+		for(int i = 0; i < p.length-1; i++){
+			System.out.print(printMatrix(array[i]));
+
+		}
+		//		Scanner input = new Scanner(System.in);
+		//menu(input);
 	}
+	
 }

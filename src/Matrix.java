@@ -10,6 +10,7 @@ public class Matrix {
 	public Matrix(int r, int c){
 		this.rows = r;
 		this.columns = c;
+		this.matrix = new int[r][c];
 	}
 	
 	public int getRows(){
