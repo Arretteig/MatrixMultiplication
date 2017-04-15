@@ -7,7 +7,6 @@ public class MatrixChainMultiplication {
 	private static int[] p = { 30, 35, 15, 5, 10, 20, 25 }; // Array of dimensions
 	private static int[][] m; // Tracks lowest scalar multiplications.
 	private static int[][] s; // Tracks correct path.
-	private static Matrix c; // Matrix used to multiply matrices.
 	private static Matrix[] array;
 
 	public static void matrixChainOrder() {
@@ -42,31 +41,38 @@ public class MatrixChainMultiplication {
 		System.out.println(printOptimalParens(1, p.length - 1));
 	}
 
-	public static Matrix recursiveChainMultiply(Matrix[] A, int t, int i, int j) {
+	public static Matrix recursiveChainMultiply(){
+		int i = 0;
+		int j = array.length-1;
+		return recursiveChainMultiply(i, j);
+	}
+	
+	public static Matrix recursiveChainMultiply(int i, int j) {
 		if (i == j) {
-			return A[i];
+			return array[i];
 		} else {
-			Matrix leftChain = recursiveChainMultiply(A, t, i, s[i][j]);
-			Matrix rightChain = recursiveChainMultiply(A, t, s[i][j] + 1, j);
-			matrixMultiply(leftChain, rightChain);
+			Matrix leftChain = recursiveChainMultiply(i, s[i][j]);
+			Matrix rightChain = recursiveChainMultiply(s[i][j]+1, j);
+			Matrix c = matrixMultiply(leftChain, rightChain);
 			return c;
 		}
 	}
 
-	private static void matrixMultiply(Matrix A, Matrix B) {
+	private static Matrix matrixMultiply(Matrix A, Matrix B) {
+		Matrix result = new Matrix(A.getRows(), B.getColumns());
 		if (A.getColumns() != B.getRows()) {
 			System.out.println("CAN NOT MULTIPLY");
 		} else {
-			c = new Matrix(A.getRows(), B.getColumns());
 			for (int i = 0; i < A.getRows(); i++) {
 				for (int j = 0; j < B.getColumns(); j++) {
-					c.setValue(i, j, 0);
+					result.setValue(i, j, 0);
 					for (int k = 0; k < A.getColumns(); k++) {
-						c.setValue(i, j, (c.getValue(i, j) + A.getValue(i, k) * B.getValue(k, j)));
+						result.setValue(i, j, (result.getValue(i, j) + A.getValue(i, k) * B.getValue(k, j)));
 					}
 				}
 			}
 		}
+		return result;
 	}
 
 	
@@ -206,13 +212,31 @@ public class MatrixChainMultiplication {
     }
 	
 	public static void main(String[] args) {
-		createMatrices();
-		for(int i = 0; i < p.length-1; i++){
-			System.out.print(printMatrix(array[i]));
-
-		}
-		//		Scanner input = new Scanner(System.in);
-		//menu(input);
+//		createMatrices();
+//		for(int i = 0; i < p.length-1; i++){
+//			System.out.print(printMatrix(array[i]));
+//
+//		}
+		Scanner input = new Scanner(System.in);
+		Matrix a = new Matrix(2, 1);
+		Matrix b = new Matrix(1, 2);
+		a.setValue(0, 0, 1);
+		a.setValue(1, 0, 2);
+		b.setValue(0, 0, 4);
+		b.setValue(0, 1, 3);
+		Matrix x = new Matrix(2, 2);
+		p = new int[3];
+		p[0] = 2;
+		p[1] = 1;
+		p[2] = 2;
+		menu(input);
+		array = new Matrix[2];
+		array[0] = a;
+		array[1] = b;
+		x = recursiveChainMultiply();
+//		x = matrixMultiply(a, b);
+		System.out.println(printMatrix(x));
+		
 	}
 	
 }
