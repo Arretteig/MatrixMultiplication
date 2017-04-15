@@ -2,13 +2,25 @@
 import java.io.IOException;
 import java.util.Scanner;
 
+/**
+ * 
+ * @author Ayushi Patel, Bryan Arretteig, Chandler Jones
+ *	A class that defines methods utilizing top-down and bottom-up approaches to multiply matrices  
+ */
 public class MatrixChainMultiplication {
 
+	/**
+	 * data variables
+	 */
 	private static int[] p = { 30, 35, 15, 5, 10, 20, 25 }; // Array of dimensions
 	private static int[][] m; // Tracks lowest scalar multiplications.
 	private static int[][] s; // Tracks correct path.
 	private static Matrix[] array;
 
+	/**
+	 * Finds the least amount of scalar multiplications when multiplying matrices and puts the smallest amount in m
+	 * s array keeps track of the shortest path
+	 */
 	public static void matrixChainOrder() {
 		int n = p.length - 1;
 		m = new int[n + 1][n + 1];
@@ -30,6 +42,12 @@ public class MatrixChainMultiplication {
 		}
 	}
 
+
+	/**
+	 * toString method that prints the order of operations of the fastest way to multiply matrices together
+	 * @param i 
+	 * @param j 
+	 */
 	private static String printOptimalParens(int i, int j) {
 		if (i == j)
 			return " A" + i + " ";
@@ -58,6 +76,11 @@ public class MatrixChainMultiplication {
 		}
 	}
 
+	/**
+	 * Multiplies two matrices to produce one resultant matrix
+	 * @param matrix A
+	 * @param matrix B
+	 */
 	private static Matrix matrixMultiply(Matrix A, Matrix B) {
 		Matrix result = new Matrix(A.getRows(), B.getColumns());
 		if (A.getColumns() != B.getRows()) {
@@ -132,11 +155,10 @@ public class MatrixChainMultiplication {
 			System.out.println();
 		}
 		
-//		Matrix[] matrices = new Matrix[p.length-1];
-//		createMatrices();
+		createMatrices();
 		
 		long timeLTR = System.nanoTime();
-//		matrixChainMultiply(matrices, 0, 0, 0);		
+		unoptimizedMultiplication();
 		timeLTR = System.nanoTime() - timeLTR;
 		
 		long timeMCO = System.nanoTime();
@@ -148,7 +170,7 @@ public class MatrixChainMultiplication {
 		timeMMO = System.nanoTime() - timeMMO;
 		
 		long timeOpt = System.nanoTime();
-//		matrixChainMultiply(matrices, 0, 0, 0);		
+		recursiveChainMultiply();
 		timeOpt = System.nanoTime() - timeOpt;
 		
 		printOptimal();
@@ -157,6 +179,24 @@ public class MatrixChainMultiplication {
 		System.out.println("Multiplying in order of left to right took " + timeLTR + " nanoseconds.");
 		System.out.println("Multiplying in optimal order took " + timeOpt + " nanoseconds.");
 		System.out.println("Memoized matrix and multiplying total: [" + (timeMMO + timeOpt) + "] nanoseconds.");
+	}
+
+
+	private static Matrix unoptimizedMultiplication() {
+		int i = 1;
+		Matrix start = array[0];
+		Matrix result = unoptimizedMultiplication(i, start);
+		return result;
+	}
+	
+	
+	private static Matrix unoptimizedMultiplication(int i, Matrix start) {
+		if(i == array.length-1){
+			return start;
+		}
+		Matrix result = matrixMultiply(start, array[i]);
+		result = unoptimizedMultiplication(i+1, result);
+		return result;
 	}
 
 
@@ -212,31 +252,8 @@ public class MatrixChainMultiplication {
     }
 	
 	public static void main(String[] args) {
-//		createMatrices();
-//		for(int i = 0; i < p.length-1; i++){
-//			System.out.print(printMatrix(array[i]));
-//
-//		}
 		Scanner input = new Scanner(System.in);
-		Matrix a = new Matrix(2, 1);
-		Matrix b = new Matrix(1, 2);
-		a.setValue(0, 0, 1);
-		a.setValue(1, 0, 2);
-		b.setValue(0, 0, 4);
-		b.setValue(0, 1, 3);
-		Matrix x = new Matrix(2, 2);
-		p = new int[3];
-		p[0] = 2;
-		p[1] = 1;
-		p[2] = 2;
 		menu(input);
-		array = new Matrix[2];
-		array[0] = a;
-		array[1] = b;
-		x = recursiveChainMultiply();
-//		x = matrixMultiply(a, b);
-		System.out.println(printMatrix(x));
-		
 	}
 	
 }
