@@ -158,7 +158,7 @@ public class MatrixChainMultiplication {
 		createMatrices();
 		
 		long timeLTR = System.nanoTime();
-		unoptimizedMultiplication();
+		Matrix print = unoptimizedMultiplication();
 		timeLTR = System.nanoTime() - timeLTR;
 		
 		long timeMCO = System.nanoTime();
@@ -191,7 +191,7 @@ public class MatrixChainMultiplication {
 	
 	
 	private static Matrix unoptimizedMultiplication(int i, Matrix start) {
-		if(i == array.length-1){
+		if(i == array.length){
 			return start;
 		}
 		Matrix result = matrixMultiply(start, array[i]);
@@ -220,7 +220,6 @@ public class MatrixChainMultiplication {
 	}
 	
 
-	@SuppressWarnings("unused")
 	private static void createMatrices() {
 		int n = p.length-1;
 		array = new Matrix[n];
@@ -228,7 +227,7 @@ public class MatrixChainMultiplication {
 			array[i] = new Matrix(p[i], p[i+1]);
 			for(int row = 0; row < p[i]; row++){
 				for(int col = 0; col < p[i+1]; col++){
-					int value = (int) (Math.random() * 5) + 1;
+					int value = (int) Math.floor(Math.random() * 101);
 					array[i].setValue(row, col, value);
 				}
 			}
